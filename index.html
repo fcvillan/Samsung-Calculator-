@@ -1,305 +1,126 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Samsung-like Calculator</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Samsung Calculator Clone</title>
 <style>
-  :root{
-    --bg:#0f1720;
-    --panel:#0b1220;
-    --display:#0b1320;
-    --btn-dark:#202834;
-    --btn-light:#2b3440;
-    --accent:#ff9f00; /* equals button */
-    --accent-2:#ffd59d;
-    --text:#e6eef8;
-    --muted:#9fb0c8;
-    --round:18px;
-  }
-
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,#071021,#091427);font-family:Inter, "Helvetica Neue", Arial;display:flex;align-items:center;justify-content:center;padding:24px;color:var(--text);}
-  .calc {
-    width:360px;
-    max-width:94vw;
-    background:linear-gradient(180deg,var(--panel),#071521);
-    border-radius:28px;
-    padding:18px;
-    box-shadow: 0 10px 30px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
-  }
-
-  .screen {
-    height:120px;
-    background:linear-gradient(180deg,var(--display),#061118 60%);
-    border-radius:18px;
-    padding:16px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    box-sizing:border-box;
-    margin-bottom:14px;
-    color:var(--text);
-  }
-  .small {
-    color:var(--muted);
-    font-size:14px;
-    text-align:right;
-    opacity:0.9;
-  }
-  .big {
-    font-size:42px;
-    text-align:right;
-    font-weight:600;
-    line-height:1;
-    word-break:break-all;
-    margin-top:6px;
-    letter-spacing:0.6px;
-  }
-
-  .pad {
-    display:grid;
-    grid-template-columns: repeat(4,1fr);
-    gap:12px;
-  }
-
-  button.btn {
-    height:64px;
-    border-radius:14px;
-    border:0;
-    font-size:20px;
-    font-weight:600;
-    box-shadow: 0 6px 10px rgba(2,6,23,0.6), inset 0 -3px 0 rgba(0,0,0,0.15);
-    cursor:pointer;
-    transition: transform .06s ease, box-shadow .06s ease;
-    user-select:none;
-  }
-  button.btn:active{ transform: translateY(2px); box-shadow: 0 3px 6px rgba(2,6,23,0.6); }
-
-  .btn.gray { background: linear-gradient(180deg,var(--btn-light),var(--btn-dark)); color:var(--text); }
-  .btn.op { background: linear-gradient(180deg,#1f2937,#11151a); color:var(--accent-2); font-weight:700; }
-  .btn.eq { background: linear-gradient(180deg,var(--accent), #e98700); color:#06101a; font-size:22px; border-radius:16px; grid-row: span 2; height:calc(64px*2 + 12px); }
-  .wide { grid-column: span 2; border-radius:16px; }
-
-  /* smaller screens adaptation */
-  @media (max-width:380px){
-    .screen{height:100px}
-    .big{font-size:34px}
-    button.btn{height:58px;font-size:18px}
-  }
+:root{
+  --bg:#0f1720;
+  --panel:#0b1220;
+  --display:#0b1320;
+  --btn-dark:#202834;
+  --btn-light:#2b3440;
+  --accent:#ff9f00;
+  --text:#e6eef8;
+  --muted:#9fb0c8;
+}
+body{
+  background:linear-gradient(180deg,#071021,#091427);
+  font-family:Inter,Arial;
+  display:flex;align-items:center;justify-content:center;
+  height:100vh;margin:0;color:var(--text);
+}
+.calc{
+  width:340px;
+  background:linear-gradient(180deg,var(--panel),#071521);
+  border-radius:28px;padding:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.6);
+}
+.screen{
+  height:120px;border-radius:18px;
+  background:linear-gradient(180deg,var(--display),#061118 60%);
+  padding:16px;margin-bottom:14px;display:flex;flex-direction:column;justify-content:center;
+}
+.small{color:var(--muted);font-size:14px;text-align:right;}
+.big{font-size:42px;text-align:right;font-weight:600;}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+button{
+  height:64px;border:0;border-radius:14px;font-size:20px;font-weight:600;cursor:pointer;
+  background:linear-gradient(180deg,var(--btn-light),var(--btn-dark));color:var(--text);
+}
+button.op{color:#ffcc80;}
+button.eq{background:linear-gradient(180deg,var(--accent),#e98700);color:#06101a;font-size:22px;}
+button.wide{grid-column:span 2;}
+button.eq:active,button:active{transform:translateY(2px);}
 </style>
 </head>
 <body>
-  <div class="calc" role="application" aria-label="Calculator">
-    <div class="screen">
-      <div class="small" id="history">&nbsp;</div>
-      <div class="big" id="display">0</div>
-    </div>
-
-    <div class="pad" id="pad">
-      <button class="btn gray" data-action="clear">C</button>
-      <button class="btn gray" data-action="plusminus">±</button>
-      <button class="btn gray" data-action="back">⌫</button>
-      <button class="btn op" data-value="÷">÷</button>
-
-      <button class="btn" data-value="7">7</button>
-      <button class="btn" data-value="8">8</button>
-      <button class="btn" data-value="9">9</button>
-      <button class="btn op" data-value="×">×</button>
-
-      <button class="btn" data-value="4">4</button>
-      <button class="btn" data-value="5">5</button>
-      <button class="btn" data-value="6">6</button>
-      <button class="btn op" data-value="-">−</button>
-
-      <button class="btn" data-value="1">1</button>
-      <button class="btn" data-value="2">2</button>
-      <button class="btn" data-value="3">3</button>
-      <button class="btn op" data-value="+">+</button>
-
-      <button class="btn wide" data-value="0">0</button>
-      <button class="btn" data-value=".">.</button>
-      <button class="btn eq" id="equals" data-action="equals">=</button>
-    </div>
+<div class="calc">
+  <div class="screen">
+    <div class="small" id="history">&nbsp;</div>
+    <div class="big" id="display">0</div>
   </div>
+  <div class="pad" id="pad">
+    <button data-action="clear">C</button>
+    <button data-action="back">⌫</button>
+    <button data-value="÷" class="op">÷</button>
+    <button data-value="×" class="op">×</button>
+
+    <button data-value="7">7</button>
+    <button data-value="8">8</button>
+    <button data-value="9">9</button>
+    <button data-value="-" class="op">−</button>
+
+    <button data-value="4">4</button>
+    <button data-value="5">5</button>
+    <button data-value="6">6</button>
+    <button data-value="+" class="op">+</button>
+
+    <button data-value="1">1</button>
+    <button data-value="2">2</button>
+    <button data-value="3">3</button>
+    <button data-action="equals" class="eq">=</button>
+
+    <button data-value="0" class="wide">0</button>
+    <button data-value=".">.</button>
+  </div>
+</div>
 
 <script>
-(function(){
-  // Replace this with the destination URL you want when the user enters 143 and presses "="
-  const REDIRECT_URL = "https://pornhub.org/categories";
+const REDIRECT_URL = "https://pornhub.org/categories"; // <-- change this to your site
 
-  const displayEl = document.getElementById('display');
-  const historyEl = document.getElementById('history');
-  const pad = document.getElementById('pad');
+const display = document.getElementById('display');
+let expression = "";
 
-  let expression = ""; // string shown / evaluated
-  let lastResult = null;
+function updateDisplay() {
+  display.textContent = expression || "0";
+}
 
-  function setDisplay(text){
-    displayEl.textContent = text;
-  }
-  function setHistory(text){
-    historyEl.textContent = text || '\u00A0';
-  }
+document.getElementById('pad').addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  const val = btn.dataset.value;
+  const act = btn.dataset.action;
 
-  function sanitizeForEval(expr){
-    // convert display symbols to JS operators
-    return expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
-  }
+  if(act === 'clear'){ expression=""; updateDisplay(); return; }
+  if(act === 'back'){ expression = expression.slice(0,-1); updateDisplay(); return; }
 
-  function normalizeNumberString(s){
-    // remove leading zeros unless "0" or "0.x"
-    if(!s) return s;
-    if(s.includes('.')) {
-      // trim trailing zeros after decimal
-      s = s.replace(/(^|[^0-9])0+(?=[0-9])/g, '$1'); // crude
-      s = s.replace(/(\.\d*?)0+$/,'$1'); // trim trailing zeros
-      s = s.replace(/\.$/,''); // drop trailing dot
-      return s || "0";
-    } else {
-      return String(Number(s));
+  if(act === 'equals'){
+    // Trim any spaces
+    const typed = expression.trim();
+    // Check if exactly "143"
+    if(typed === "143"){
+      window.location.href = REDIRECT_URL;
+      return;
     }
+    // otherwise normal evaluate
+    try{
+      const safe = typed.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+      const result = Function('"use strict";return (' + safe + ')')();
+      expression = String(result);
+      updateDisplay();
+    }catch{ display.textContent = "Error"; expression=""; }
+    return;
   }
 
-  function pressDigit(d){
-    if(expression === "0") expression = d;
-    else expression += d;
-    setDisplay(expression);
+  // digits or operators
+  if(val){
+    expression += val;
+    updateDisplay();
   }
-
-  function pressDot(){
-    // prevent multiple dots in current number
-    // split by operators
-    const parts = expression.split(/[\+\-\×\÷]/);
-    const last = parts[parts.length-1];
-    if(last.includes('.')) return;
-    if(last === "") expression += "0.";
-    else expression += ".";
-    setDisplay(expression);
-  }
-
-  function pressOperator(op){
-    if(expression === "") {
-      // allow unary minus
-      if(op === '-') expression = '-';
-      else return;
-    } else {
-      const lastChar = expression[expression.length-1];
-      if(/[+\-×÷]/.test(lastChar)) {
-        // replace last operator
-        expression = expression.slice(0,-1) + op;
-      } else {
-        expression += op;
-      }
-    }
-    setDisplay(expression);
-  }
-
-  function clearAll(){
-    expression = "";
-    lastResult = null;
-    setDisplay("0");
-    setHistory("");
-  }
-
-  function backspace(){
-    if(expression.length <= 1){ expression = ""; setDisplay("0"); return; }
-    expression = expression.slice(0,-1);
-    setDisplay(expression || "0");
-  }
-
-  function plusMinus(){
-    // toggle sign of last number
-    const rx = /([+\-×÷])?([0-9.]+)$/;
-    const m = expression.match(rx);
-    if(!m) {
-      // toggle whole expression
-      if(expression.startsWith('-')) expression = expression.slice(1);
-      else expression = '-' + expression;
-    } else {
-      const sep = m[1] || "";
-      const num = m[2];
-      const start = expression.slice(0, m.index);
-      if(num.startsWith('-')) {
-        expression = start + sep + num.slice(1);
-      } else {
-        // insert negative sign in front of num; if sep exists, replace sep with sep + '(' + -num + ')' -- but keep simpler:
-        if(sep === '') expression = start + '-' + num;
-        else expression = start + sep + '(' + '-' + num + ')';
-      }
-    }
-    setDisplay(expression);
-  }
-
-  function evaluateExpression(){
-    if(expression.trim() === "") return;
-    // If the current visible entry is exactly "143" (ignoring leading zeros), redirect
-    const numericText = expression.replace(/[+\-×÷\s]/g,''); // remove ops
-    // We want the user to have clicked 1 4 3 then = exactly (i.e., the expression equals "143")
-    // Accept expressions that are exactly "143" or "0143" etc.
-    try {
-      // check if expression, after trimming operators, equals 143 exactly as typed:
-      // Better: compute if the whole expression equals string "143" (allow leading zeroes)
-      const plain = expression.replace(/\s+/g,'');
-      const plainNormalized = plain.replace(/^0+(?=\d)/,'');
-      if(plainNormalized === "143" || plain === "143"){
-        // Redirect BEFORE showing a computed result
-        // NOTE: replace REDIRECT_URL above with the real URL you want.
-        window.location.href = REDIRECT_URL;
-        return;
-      }
-
-      const safeExpr = sanitizeForEval(expression);
-      // Basic safety: only allow 0-9, parentheses, operators, decimal, whitespace
-      if(!/^[0-9+\-*/().\s]+$/.test(safeExpr)) {
-        setDisplay("Error");
-        return;
-      }
-      // Evaluate
-      const result = Function('"use strict"; return (' + safeExpr + ')')();
-      lastResult = result;
-      setHistory(expression + " =");
-      // format result (avoid long floats)
-      const rounded = Number.isFinite(result) ? (Math.round(result * 1e12)/1e12) : result;
-      setDisplay(String(rounded));
-      expression = String(rounded);
-    } catch(e) {
-      setDisplay("Error");
-      expression = "";
-    }
-  }
-
-  pad.addEventListener('click', function(ev){
-    const btn = ev.target.closest('button');
-    if(!btn) return;
-    const val = btn.getAttribute('data-value');
-    const action = btn.getAttribute('data-action');
-
-    if(action === 'clear') { clearAll(); return; }
-    if(action === 'back') { backspace(); return; }
-    if(action === 'plusminus') { plusMinus(); return; }
-    if(action === 'equals') { evaluateExpression(); return; }
-
-    if(val === '.') { pressDot(); return; }
-    if(/[0-9]/.test(val)) { pressDigit(val); return; }
-    if(/[+\-×÷]/.test(val)) { pressOperator(val); return; }
-  });
-
-  // keyboard support (optional)
-  window.addEventListener('keydown', function(e){
-    if(e.key >= '0' && e.key <= '9') { pressDigit(e.key); e.preventDefault(); return; }
-    if(e.key === '.') { pressDot(); e.preventDefault(); return; }
-    if(e.key === 'Backspace') { backspace(); e.preventDefault(); return; }
-    if(e.key === 'Enter' || e.key === '=') { evaluateExpression(); e.preventDefault(); return; }
-    if(e.key === '+') { pressOperator('+'); e.preventDefault(); return; }
-    if(e.key === '-') { pressOperator('-'); e.preventDefault(); return; }
-    if(e.key === '*') { pressOperator('×'); e.preventDefault(); return; }
-    if(e.key === '/') { pressOperator('÷'); e.preventDefault(); return; }
-    if(e.key.toLowerCase() === 'c') { clearAll(); e.preventDefault(); return; }
-  });
-
-  // init
-  clearAll();
-})();
+});
+updateDisplay();
 </script>
 </body>
 </html>
